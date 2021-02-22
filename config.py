@@ -26,26 +26,33 @@
 
 from typing import List  # noqa: F401
 
-from libqtile import bar, layout, widget
+from libqtile import bar, layout, widget, extension
 from libqtile.config import Click, Drag, Group, Key, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
+from os import system
+
 mod = "mod4"
 terminal = guess_terminal()
 
-keys = [
-    # Switch between windows in current stack pane
-    Key([mod], "k", lazy.layout.down(),
-        desc="Move focus down in stack pane"),
-    Key([mod], "j", lazy.layout.up(),
-        desc="Move focus up in stack pane"),
+# GLOBALS ----------------------------------------------------------------------
 
-    # Move windows up or down in current stack
-    Key([mod, "control"], "k", lazy.layout.shuffle_down(),
-        desc="Move window down in current stack "),
-    Key([mod, "control"], "j", lazy.layout.shuffle_up(),
-        desc="Move window up in current stack "),
+globalColor="#617981",
+
+# ------------------------------------------------------------------------------
+
+keys = [
+    # Basandonos en VIM:
+    Key([mod], "h", lazy.layout.left()),
+    Key([mod], "l", lazy.layout.right()),
+    Key([mod], "j", lazy.layout.down()),
+    Key([mod], "k", lazy.layout.up()),
+
+    Key([mod, "shift"], "h", lazy.layout.swap_left()),
+    Key([mod, "shift"], "l", lazy.layout.swap_right()),
+    Key([mod, "shift"], "j", lazy.layout.shuffle_down()),
+    Key([mod, "shift"], "k", lazy.layout.shuffle_up()),
 
     # Switch window focus to other pane(s) of stack
     Key([mod], "space", lazy.layout.next(),
@@ -69,8 +76,18 @@ keys = [
 
     Key([mod, "control"], "r", lazy.restart(), desc="Restart qtile"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown qtile"),
-    Key([mod], "r", lazy.spawncmd(),
-        desc="Spawn a command using a prompt widget"),
+    Key([mod], "r", lazy.run_extension(extension.DmenuRun(
+        dmenu_prompt=":",
+        background="#15181a",
+        dmenu_font="sans-11",
+        foreground="#88ADBA",
+        selected_background=globalColor,
+        selected_foreground="#fff",
+        dmenu_ignorecase=True,
+        # dmenu_height=20,
+    ))),
+
+    #key([mod, "shift"], "m", lazy.spawn("dmenu_run"), desc="Launch dmenu"),
 ]
 
 # creau un arreglo donde cada miembro del grup tiene una letra del "asdfuiop"
@@ -92,13 +109,18 @@ for i in groups:
     ])
 
 layouts = [
-    layout.Max(),
-    layout.Stack(num_stacks=2),
+    # layout.Max(),
+    # layout.Stack(num_stacks=2),
     # Try more layouts by unleashing below layouts.
     # layout.Bsp(),
     # layout.Columns(),
     # layout.Matrix(),
-    # layout.MonadTall(),
+    layout.MonadTall(
+        border_focus=globalColor,
+        margin=8,
+#        single_border_width="#000",
+#        single_margin=0,
+    ),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
@@ -183,3 +205,14 @@ focus_on_window_activation = "smart"
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
+
+# ==============================================================================
+# configuraciones al inicio de seccion =========================================
+# ==============================================================================
+autoStart = [
+    "feh --bg-fill /home/axel/Pictures/wallpapers/wall5.jpg",
+    "caffeine",
+]
+
+for i in autoStart:
+    system(i)
