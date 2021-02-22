@@ -54,13 +54,19 @@ keys = [
     Key([mod, "shift"], "j", lazy.layout.shuffle_down()),
     Key([mod, "shift"], "k", lazy.layout.shuffle_up()),
 
+    Key([mod], "m", lazy.layout.grow()),
+    Key([mod], "b", lazy.layout.shrink()),
+    Key([mod], "n", lazy.layout.maximize()),
+    Key([mod, "shift"], "space", lazy.layout.flip()),
+    Key([mod, "shift"], "n", lazy.layout.normalize()),
+
     # Switch window focus to other pane(s) of stack
     Key([mod], "space", lazy.layout.next(),
         desc="Switch window focus to other pane(s) of stack"),
 
     # Swap panes of split stack
-    Key([mod, "shift"], "space", lazy.layout.rotate(),
-        desc="Swap panes of split stack"),
+#    Key([mod, "shift"], "space", lazy.layout.rotate(),
+#        desc="Swap panes of split stack"),
 
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
@@ -116,8 +122,8 @@ layouts = [
     layout.MonadTall(
         border_focus="#617981",
         margin=8,
-#        single_border_width="#000",
-#        single_margin=0,
+        single_border_width=0,
+        single_margin=0,
     ),
     # layout.MonadWide(),
     # layout.RatioTile(),
@@ -209,6 +215,7 @@ wmname = "LG3D"
 # ==============================================================================
 autoStart = [
     "feh --bg-fill /home/axel/Pictures/wallpapers/imagen1.jpg",
+    "picom -b",
 #    "caffeine",
 ]
 
