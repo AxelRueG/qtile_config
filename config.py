@@ -81,13 +81,11 @@ keys = [
         background="#15181a",
         dmenu_font="sans-11",
         foreground="#88ADBA",
-        selected_background=globalColor,
+        selected_background="#617981",
         selected_foreground="#fff",
         dmenu_ignorecase=True,
-        # dmenu_height=20,
     ))),
 
-    #key([mod, "shift"], "m", lazy.spawn("dmenu_run"), desc="Launch dmenu"),
 ]
 
 # creau un arreglo donde cada miembro del grup tiene una letra del "asdfuiop"
@@ -116,7 +114,7 @@ layouts = [
     # layout.Columns(),
     # layout.Matrix(),
     layout.MonadTall(
-        border_focus=globalColor,
+        border_focus="#617981",
         margin=8,
 #        single_border_width="#000",
 #        single_margin=0,
@@ -210,8 +208,8 @@ wmname = "LG3D"
 # configuraciones al inicio de seccion =========================================
 # ==============================================================================
 autoStart = [
-    "feh --bg-fill /home/axel/Pictures/wallpapers/wall5.jpg",
-    "caffeine",
+    "feh --bg-fill /home/axel/Pictures/wallpapers/imagen1.jpg",
+#    "caffeine",
 ]
 
 for i in autoStart:
