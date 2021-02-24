@@ -27,7 +27,7 @@
 from typing import List  # noqa: F401
 
 from libqtile import bar, layout, widget, extension
-from libqtile.config import Click, Drag, Group, Key, Screen
+from libqtile.config import Click, Drag, Group, Key, Screen, Match
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
@@ -37,8 +37,13 @@ mod = "mod4"
 terminal = guess_terminal()
 
 # GLOBALS ----------------------------------------------------------------------
-
-globalColor="#617981",
+colors = [["#282c34", "#282c34"], # panel background
+          ["#434758", "#434758"], # background for current screen tab
+          ["#ffffff", "#ffffff"], # font color for group names
+          ["#ff5555", "#ff5555"], # border line color for current tab
+          ["#8d62a9", "#8d62a9"], # border line color for other tab and odd widgets
+          ["#668bd7", "#668bd7"], # color for the even widgets
+          ["#e1acff", "#e1acff"]] # window name
 
 # ------------------------------------------------------------------------------
 
@@ -64,7 +69,7 @@ keys = [
     Key([mod], "space", lazy.layout.next(),
         desc="Switch window focus to other pane(s) of stack"),
 
-    # Swap panes of split stack
+#    Swap panes of split stack
 #    Key([mod, "shift"], "space", lazy.layout.rotate(),
 #        desc="Swap panes of split stack"),
 
@@ -92,19 +97,49 @@ keys = [
         dmenu_ignorecase=True,
     ))),
 
+    # Volume
+    Key([], "XF86AudioLowerVolume", lazy.spawn(
+        "pactl set-sink-volume @DEFAULT_SINK@ -5%"
+    )),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn(
+        "pactl set-sink-volume @DEFAULT_SINK@ +5%"
+    )),
+    Key([], "XF86AudioMute", lazy.spawn(
+        "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    )),
+
+    # Brightness
+    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set +10%")),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 10%-")),
 ]
 
 # creau un arreglo donde cada miembro del grup tiene una letra del "asdfuiop"
-groups = [Group(i) for i in "asdfuiop"]
+# groups = [Group(i) for i in "asdfuiop"]
+__groups = {
+    #1: Group("TER"),
+    1: Group("TER",matches=[Match(wm_class=["terminator"])]),
+    #2: Group("WWW"),
+    2: Group("WWW",matches=[Match(wm_class=["firefox","google-chrome-stable"])]),
+    #3: Group("Codes"),
+    3: Group("Codes",matches=[Match(wm_class=["code"])]),
+
+    4: Group("A"),
+    5: Group("B"),
+}
+
+groups = [__groups[i] for i in __groups]
+
+def get_group_key(name):
+    return [k for k, g in __groups.items() if g.name==name][0]
 
 for i in groups:
     keys.extend([
         # mod1 + letter of group = switch to group
-        Key([mod], i.name, lazy.group[i.name].toscreen(),
+        Key([mod], str(get_group_key(i.name)), lazy.group[i.name].toscreen(),
             desc="Switch to group {}".format(i.name)),
 
         # mod1 + shift + letter of group = switch to & move focused window to group
-        Key([mod, "shift"], i.name, lazy.window.togroup(i.name, switch_group=True),
+        Key([mod, "shift"], str(get_group_key(i.name)), lazy.window.togroup(i.name, switch_group=True),
             desc="Switch to & move focused window to group {}".format(i.name)),
         # Or, use below if you prefer not to switch to that group.
         # # mod1 + shift + letter of group = move focused window to group
@@ -140,27 +175,151 @@ widget_defaults = dict(
 )
 extension_defaults = widget_defaults.copy()
 
+## == CONFIGURACION DE BAR =====================================================
 screens = [
     Screen(
         top=bar.Bar(
             [
-                widget.CurrentLayout(),
-                widget.GroupBox(),
-                widget.Prompt(),
-                widget.WindowName(),
+                # widget.CurrentLayout(),
+                widget.GroupBox(
+                    #font = "Ubuntu Bold",
+                    fontsize = 11,
+                    margin_y = 3,
+                    margin_x = 0,
+                    padding_y = 5,
+                    padding_x = 3,
+                    borderwidth = 3,
+                    active = colors[2],
+                    inactive = colors[2],
+                    rounded = False,
+                    highlight_color = colors[1],
+                    highlight_method = "line",
+                    this_current_screen_border = colors[3],
+                    this_screen_border = colors [4],
+                    other_current_screen_border = colors[0],
+                    other_screen_border = colors[0],
+                    foreground = colors[2],
+                    background = colors[0],
+                ),
+                # widget.Prompt(),
+                widget.WindowName(
+                    foreground = colors[6],
+                    background = colors[0],
+                    padding = 0,
+                    ),
                 widget.Chord(
                     chords_colors={
                         'launch': ("#ff0000", "#ffffff"),
                     },
                     name_transform=lambda name: name.upper(),
                 ),
-                widget.TextBox("default config", name="default"),
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                # ==============================================================
+                widget.Net(
+                    interface = "wlp1s0",
+                    format = "{down} ↓↑ {up}",
+                ),
+                # widget.Systray(
+                #        background = colors[4],
+                #        foreground = colors[2],
+                #        icon_size=25,
+                # ),
+                widget.TextBox(
+                       text='',
+                       background = colors[0],
+                       foreground = colors[4],
+                       padding = 0,
+                       fontsize = 37
+                       ),
+                widget.TextBox(
+                       text='',
+                       background = colors[4],
+                       foreground = colors[2],
+                       ),
+                widget.Volume(
+                    #    format = '{interface}: {down} ↓↑ {up}',
+                       foreground = colors[2],
+                       background = colors[4],
+                       padding = 5
+                       ),              
+                widget.TextBox(
+                       text = '',
+                       background = colors[4],
+                       foreground = colors[5],
+                       padding = 0,
+                       fontsize = 37
+                       ),
+                widget.TextBox(
+                        text = " 🖬",
+                        foreground = colors[2],
+                        background = colors[5],
+                        padding = 0,
+                        fontsize = 14
+                        ),
+                widget.Memory(
+                        foreground = colors[2],
+                        background = colors[5],
+                        mouse_callbacks = {'Button1': lambda qtile: qtile.cmd_spawn(terminal + ' -e htop')},
+                        padding = 5
+                        ),
+
+                widget.TextBox(
+                        text='',
+                        background = colors[5],
+                        foreground = colors[4],
+                        padding = 0,
+                        fontsize = 37
+                        ),
+                widget.TextBox(
+                        text = " ⟳",
+                        padding = 2,
+                        foreground = colors[2],
+                        background = colors[4],
+                        fontsize = 14
+                        ),
+                widget.Pacman(
+                        update_interval = 1800,
+                        foreground = colors[2],
+                        mouse_callbacks = {'Button1': lambda qtile: qtile.cmd_spawn(terminal + ' -e sudo pacman -Syu')},
+                        background = colors[4]
+                        ),
+                # widget.TextBox(
+                #         text = "Updates",
+                #         padding = 5,
+                #         mouse_callbacks = {'Button1': lambda qtile: qtile.cmd_spawn(myTerm + ' -e sudo pacman -Syu')},
+                #         foreground = colors[2],
+                #         background = colors[4]
+                #         ),
+                widget.TextBox(
+                       text='',
+                       background = colors[4],
+                       foreground = colors[5],
+                       padding = 0,
+                       fontsize = 37
+                       ),
+
+                widget.Clock(
+                       format='%d-%m-%Y %a %I:%M %p',
+                       background = colors[5],
+                       foreground = colors[2],
+
+                ),
+                widget.TextBox(
+                       text='',
+                       background = colors[5],
+                       foreground = colors[4],
+                       padding = 0,
+                       fontsize = 37
+                       ),
                 widget.Systray(),
-                widget.Clock(format='%d-%m-%Y %a %I:%M %p'),
-                widget.QuickExit(),
+                widget.QuickExit(
+                       background = colors[4],
+                       foreground = colors[2],
+                       default_text="  ",
+                ),
             ],
             24,
+            background=colors[0],
+            opacity=0.7,
         ),
     ),
 ]
@@ -177,7 +336,7 @@ mouse = [
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: List
 main = None  # WARNING: this is deprecated and will be removed soon
-follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 cursor_warp = False
 floating_layout = layout.Floating(float_rules=[
@@ -216,6 +375,11 @@ wmname = "LG3D"
 autoStart = [
     "feh --bg-fill /home/axel/Pictures/wallpapers/imagen1.jpg",
     "picom -b",
+    #"bash ./scripts/startBM.sh",
+    #"bash ./scripts/startCaffeine.sh",
+    # "bash ./scripts/startNM.sh",
+
+
 #    "caffeine",
 ]
 
