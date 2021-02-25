@@ -1,3 +1,3 @@
 #! /bin/bash
-caffeine &
-<Cr>
+dmenu_run caffeine
+

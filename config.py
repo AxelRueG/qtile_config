@@ -155,7 +155,8 @@ layouts = [
     # layout.Columns(),
     # layout.Matrix(),
     layout.MonadTall(
-        border_focus="#617981",
+        border_focus="#8d62a9",
+        border_width=3,
         margin=8,
         single_border_width=0,
         single_margin=0,
@@ -380,7 +381,7 @@ autoStart = [
     "picom -b",
     #"bash ./scripts/startBM.sh",
     #"bash ./scripts/startCaffeine.sh",
-    # "bash ./scripts/startNM.sh",
+    #"bash ./scripts/startNM.sh",
 
 
 #    "caffeine",

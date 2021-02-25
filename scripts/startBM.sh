@@ -1,2 +1,2 @@
 #! /bin/bash
-blueman-applet & 
+dmenu_run blueman-applet

@@ -1,2 +1,2 @@
 #! /bin/bash
-nm-applet &
+dmenu_run nm-applet
