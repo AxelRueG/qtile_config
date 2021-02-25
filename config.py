@@ -310,7 +310,10 @@ screens = [
                        padding = 0,
                        fontsize = 37
                        ),
-                widget.Systray(),
+                widget.Systray(
+                        background=colors[4],
+                        foreground=colors[2],
+                ),
                 widget.QuickExit(
                        background = colors[4],
                        foreground = colors[2],
